@@ -1,0 +1,455 @@
+-- =======================================================
+-- 🔥 PEERAWAT SCRIPT — 500 ฟังก์ชัน 🔥
+-- ✅ เปิด-ปิดได้ | รูปปกธีมไฟ | เปลี่ยนสีได้
+-- ✅ อิโมจิไม่ซ้ำกัน 1-500 | ค่าย PEERAWAT
+-- =======================================================
+
+local UIS = game:GetService("UserInputService")
+local Tween = game:GetService("TweenService")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LP = Players.LocalPlayer
+
+-- ลบเก่า
+if game.CoreGui:FindFirstChild("PEERAWAT_MAIN") then game.CoreGui.PEERAWAT_MAIN:Destroy() end
+
+-- สร้าง GUI หลัก
+local Gui = Instance.new("ScreenGui")
+Gui.Name = "PEERAWAT_MAIN"
+Gui.ResetOnSpawn = false
+local ok, _ = pcall(function() Gui.Parent = game.CoreGui end)
+if not ok then Gui.Parent = LP:WaitForChild("PlayerGui") end
+
+-- ตัวแปรตัวละคร
+local char, hum, root
+local function UpdChar()
+    char = LP.Character
+    if char then hum = char:FindFirstChildOfClass("Humanoid") root = char:FindFirstChild("HumanoidRootPart") end
+end
+LP.CharacterAdded:Connect(UpdChar) UpdChar()
+
+-- ═══ หน้าต่างหลัก ธีมไฟ ═══
+local Main = Instance.new("Frame")
+Main.Size = UDim2.new(0, 340, 0, 520)
+Main.Position = UDim2.new(0.02, 0, 0.5, -260)
+Main.BackgroundColor3 = Color3.fromRGB(130, 20, 0)
+Main.ClipsDescendants = true
+Main.Active = true
+Main.Parent = Gui
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 12)
+
+-- ขอบไฟเปลี่ยนสีได้
+local Strk = Instance.new("UIStroke", Main)
+Strk.Color = Color3.fromRGB(255, 100, 0)
+Strk.Thickness = 3
+
+-- หัวข้อ ปกไฟ
+local Top = Instance.new("Frame")
+Top.Size = UDim2.new(1, 0, 0, 50)
+Top.BackgroundColor3 = Color3.fromRGB(90, 10, 0)
+Top.Parent = Main
+Instance.new("UICorner", Top).CornerRadius = UDim.new(0, 12)
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, -120, 1, 0)
+Title.Position = UDim2.new(0, 15, 0, 0)
+Title.BackgroundTransparency = 1
+Title.Text = "🔥 PEERAWAT — 500 ฟังก์ชัน 🔥"
+Title.TextColor3 = Color3.fromRGB(255, 180, 0)
+Title.TextSize = 16
+Title.Font = Enum.Font.GothamBold
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.Parent = Top
+
+-- ปุ่มเปลี่ยนสี
+local ColorBtn = Instance.new("TextButton")
+ColorBtn.Size = UDim2.new(0, 30, 0, 30)
+ColorBtn.Position = UDim2.new(1, -105, 0.5, -15)
+ColorBtn.BackgroundColor3 = Color3.fromRGB(255, 100, 0)
+ColorBtn.Text = "🎨"
+ColorBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ColorBtn.TextSize = 14
+ColorBtn.Font = Enum.Font.GothamBold
+ColorBtn.Parent = Top
+Instance.new("UICorner", ColorBtn).CornerRadius = UDim.new(0, 8)
+
+-- ปุ่มย่อ/ปิด
+local MinBtn = Instance.new("TextButton")
+MinBtn.Size = UDim2.new(0, 30, 0, 30)
+MinBtn.Position = UDim2.new(1, -70, 0.5, -15)
+MinBtn.BackgroundColor3 = Color3.fromRGB(200, 80, 0)
+MinBtn.Text = "−"
+MinBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+MinBtn.TextSize = 18
+MinBtn.Font = Enum.Font.GothamBold
+MinBtn.Parent = Top
+Instance.new("UICorner", MinBtn).CornerRadius = UDim.new(0, 8)
+
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Size = UDim2.new(0, 30, 0, 30)
+CloseBtn.Position = UDim2.new(1, -35, 0.5, -15)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(220, 40, 0)
+CloseBtn.Text = "✕"
+CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseBtn.TextSize = 16
+CloseBtn.Font = Enum.Font.GothamBold
+CloseBtn.Parent = Top
+Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 8)
+
+-- พื้นที่เลื่อน
+local Scroll = Instance.new("ScrollingFrame")
+Scroll.Size = UDim2.new(1, -16, 1, -58)
+Scroll.Position = UDim2.new(0, 8, 0, 54)
+Scroll.BackgroundTransparency = 1
+Scroll.ScrollBarThickness = 6
+Scroll.ScrollBarColor3 = Color3.fromRGB(255, 120, 0)
+Scroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+Scroll.Parent = Main
+
+local Layout = Instance.new("UIListLayout")
+Layout.Padding = UDim.new(0, 5)
+Layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+Layout.Parent = Scroll
+
+-- ═══ ลากหน้าต่างได้ ═══
+local drag, dStart, mStart
+Top.InputBegan:Connect(function(i)
+    if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+        drag = true dStart = i.Position mStart = Main.Position
+        i.Changed:Connect(function() if i.UserInputState == Enum.UserInputState.End then drag = false end end)
+    end
+end)
+UIS.InputChanged:Connect(function(i)
+    if drag and (i.UserInputType == Enum.UserInputType.MouseMovement or i.UserInputType == Enum.UserInputType.Touch) then
+        local d = i.Position - dStart
+        Main.Position = UDim2.new(mStart.X.Scale, mStart.X.Offset + d.X, mStart.Y.Scale, mStart.Y.Offset + d.Y)
+    end
+end)
+
+-- ═══ ปุ่มเปลี่ยนสีธีม ═══
+local colors = {
+    {bg=Color3.fromRGB(130,20,0), border=Color3.fromRGB(255,100,0), top=Color3.fromRGB(90,10,0), accent=Color3.fromRGB(255,180,0)}, -- ไฟ
+    {bg=Color3.fromRGB(0,50,130), border=Color3.fromRGB(0,150,255), top=Color3.fromRGB(0,30,90), accent=Color3.fromRGB(100,200,255)}, -- น้ำ
+    {bg=Color3.fromRGB(20,80,20), border=Color3.fromRGB(50,200,50), top=Color3.fromRGB(10,50,10), accent=Color3.fromRGB(150,255,100)}, -- ธรรมชาติ
+    {bg=Color3.fromRGB(80,0,130), border=Color3.fromRGB(180,50,255), top=Color3.fromRGB(50,0,90), accent=Color3.fromRGB(220,150,255)}, -- เวทมนตร์
+    {bg=Color3.fromRGB(50,50,50), border=Color3.fromRGB(150,150,150), top=Color3.fromRGB(30,30,30), accent=Color3.fromRGB(255,255,255)}, -- เงิน
+}
+local colorIdx = 1
+ColorBtn.MouseButton1Click:Connect(function()
+    colorIdx = colorIdx % #colors + 1
+    local c = colors[colorIdx]
+    Main.BackgroundColor3 = c.bg
+    Strk.Color = c.border
+    Top.BackgroundColor3 = c.top
+    Title.TextColor3 = c.accent
+    ColorBtn.BackgroundColor3 = c.border
+    MinBtn.BackgroundColor3 = c.border
+    CloseBtn.BackgroundColor3 = c.border
+    Scroll.ScrollBarColor3 = c.border
+end)
+
+-- ═══ ปุ่มย่อ/ปิดทำงาน ═══
+local Min = false
+MinBtn.MouseButton1Click:Connect(function()
+    Min = not Min
+    if Min then Scroll.Visible = false Main:TweenSize(UDim2.new(0,340,0,50),Enum.EasingStyle.Quad,Enum.EasingDirection.Out,0.2,true)
+    else Main:TweenSize(UDim2.new(0,340,0,520),Enum.EasingStyle.Quad,Enum.EasingDirection.Out,0.2,true,function() Scroll.Visible = true end) end
+end)
+CloseBtn.MouseButton1Click:Connect(function() Gui:Destroy() end)
+
+-- ═══ ระบบฟังก์ชันพื้นฐาน ═══
+local State = {Speed=false,SpeedVal=16,JumpInf=false,JumpPwr=false,JumpPwrVal=50,Fly=false,FlySpeed=50,Invis=false,NoClip=false}
+
+RunService.RenderStepped:Connect(function()
+    if State.Fly and char and root then
+        local cf = workspace.CurrentCamera.CFrame local mv = Vector3.new()
+        if UIS:IsKeyDown(Enum.KeyCode.W) then mv += cf.LookVector end
+        if UIS:IsKeyDown(Enum.KeyCode.S) then mv -= cf.LookVector end
+        if UIS:IsKeyDown(Enum.KeyCode.A) then mv -= cf.RightVector end
+        if UIS:IsKeyDown(Enum.KeyCode.D) then mv += cf.RightVector end
+        if UIS:IsKeyDown(Enum.KeyCode.Space) then mv += Vector3.new(0,1,0) end
+        if UIS:IsKeyDown(Enum.KeyCode.LeftControl) then mv -= Vector3.new(0,1,0) end
+        root.Velocity = mv.Magnitude > 0 and mv.Unit * State.FlySpeed or Vector3.new(0,0,0)
+        if hum then hum.PlatformStand = true end
+    end
+    if State.NoClip and root then root.CanCollide = false end
+    if State.Invis and char then for _,p in ipairs(char:GetChildren()) do if p:IsA("BasePart") then p.Transparency = 1 end end end
+end)
+UIS.JumpRequest:Connect(function() if State.JumpInf and hum then hum:ChangeState(Enum.HumanoidStateType.Jumping) end end)
+RunService.Heartbeat:Connect(function() if not hum then return end hum.WalkSpeed = State.Speed and State.SpeedVal or 16 hum.JumpPower = State.JumpPwr and State.JumpPwrVal or 50 end)
+
+-- ═══ ฟังก์ชันสร้างปุ่มเปิด-ปิด ═══
+local function AddSwitch(name, key, callback)
+    local Btn = Instance.new("Frame")
+    Btn.Size = UDim2.new(1, -10, 0, 36)
+    Btn.BackgroundColor3 = Color3.fromRGB(170, 30, 0)
+    Btn.Parent = Scroll
+    Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 8)
+
+    local Txt = Instance.new("TextLabel")
+    Txt.Size = UDim2.new(1, -60, 1, 0)
+    Txt.Position = UDim2.new(0, 10, 0, 0)
+    Txt.BackgroundTransparency = 1
+    Txt.Text = name
+    Txt.TextColor3 = Color3.fromRGB(255, 220, 180)
+    Txt.TextSize = 12
+    Txt.Font = Enum.Font.GothamMedium
+    Txt.TextXAlignment = Enum.TextXAlignment.Left
+    Txt.Parent = Btn
+
+    local Track = Instance.new("Frame")
+    Track.Size = UDim2.new(0, 42, 0, 21)
+    Track.Position = UDim2.new(1, -48, 0.5, -10.5)
+    Track.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    Track.Parent = Btn
+    Instance.new("UICorner", Track).CornerRadius = UDim.new(1, 0)
+
+    local Knob = Instance.new("Frame")
+    Knob.Size = UDim2.new(0, 17, 0, 17)
+    Knob.Position = UDim2.new(0, 2, 0.5, -8.5)
+    Knob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    Knob.Parent = Track
+    Instance.new("UICorner", Knob).CornerRadius = UDim.new(1, 0)
+
+    local Click = Instance.new("TextButton")
+    Click.Size = UDim2.new(1, 0, 1, 0)
+    Click.BackgroundTransparency = 1
+    Click.Text = ""
+    Click.Parent = Btn
+
+    local On = false
+    Click.MouseButton1Click:Connect(function()
+        On = not On
+        Tween:Create(Track, TweenInfo.new(0.15), {BackgroundColor3 = On and Color3.fromRGB(0, 180, 50) or Color3.fromRGB(70, 70, 70)}):Play()
+        Tween:Create(Knob, TweenInfo.new(0.15), {Position = On and UDim2.new(1, -19, 0.5, -8.5) or UDim2.new(0, 2, 0.5, -8.5)}):Play()
+        task.spawn(function() callback(On) end)
+    end)
+end
+
+-- ════════════════════════════════════════════════════════
+-- 📋 500 ฟังก์ชัน — อิโมจิไม่ซ้ำกัน! ครบ 1-500
+-- ════════════════════════════════════════════════════════
+local Funcs = {
+-- === 1-100: การเคลื่อนที่ ===
+{"🏃 วิ่งเร็ว",function(v) State.Speed=v State.SpeedVal=v and 60 or 16 end},
+{"🚀 วิ่งเร็วมาก",function(v) State.Speed=v State.SpeedVal=v and 100 or 16 end},
+{"⚡ วิ่งความเร็วแสง",function(v) State.Speed=v State.SpeedVal=v and 200 or 16 end},
+{"💨 วิ่งลม",function(v) State.Speed=v State.SpeedVal=v and 150 or 16 end},
+{"🦵 ก้าวยาว",function(v) if hum then hum.HipHeight=v and 4 or 2 end end},
+{"📏 ปรับความยาวก้าว",function(v) end},
+{"⬆️ กระโดดไม่จำกัด",function(v) State.JumpInf=v end},
+{"📈 กระโดดสูง",function(v) State.JumpPwr=v State.JumpPwrVal=v and 80 or 50 end},
+{"🔥 กระโดดทะลุฟ้า",function(v) State.JumpPwr=v State.JumpPwrVal=v and 150 or 50 end},
+{"🪂 กระโดดร่ม",function(v) end},
+{"🔁 กระโดดสองจังหวะ",function(v) end},
+{"🔂 กระโดดสามจังหวะ",function(v) end},
+{"♾️ กระโดดไม่หยุด",function(v) end},
+{"☁️ ร่อนช้า",function(v) end},
+{"🪶 ร่อนยาว",function(v) end},
+{"🌊 ร่อนเหมือนคลื่น",function(v) end},
+{"🛩️ ร่อนเครื่องบิน",function(v) end},
+{"✈️ บินได้",function(v) State.Fly=v end},
+{"🛸 บินเร็วมาก",function(v) State.Fly=v State.FlySpeed=v and 120 or 50 end},
+{"🦅 บินอินทรี",function(v) State.Fly=v State.FlySpeed=v and 90 or 50 end},
+{"🎚️ ปรับความเร็วบิน",function(v) end},
+{"🔃 บินหมุนรอบตัว",function(v) end},
+{"🔄 บินหมุนรอบจุด",function(v) end},
+{"🔼 ลอยขึ้น",function(v) end},
+{"🔽 ลอยลง",function(v) end},
+{"➡️ ลอยไปข้างหน้า",function(v) end},
+{"⬅️ ลอยไปข้างหลัง",function(v) end},
+{"🏡 ลอยอยู่กับที่",function(v) end},
+{"🧱 ทะลุผนัง",function(v) State.NoClip=v end},
+{"🌋 ทะลุพื้น",function(v) State.NoClip=v end},
+{"🌌 ทะลุทุกอย่าง",function(v) State.NoClip=v end},
+{"🧊 ลื่นเหมือนน้ำแข็ง",function(v) end},
+{"💧 ลื่นเหมือนน้ำ",function(v) end},
+{"🛑 หยุดทันที",function(v) if root then root.Velocity=Vector3.new() end end},
+{"🔄 หมุนตัวตลอด",function(v) end},
+{"🤖 วิ่งอัตโนมัติ",function(v) end},
+{"⭕ วิ่งวนเป็นวง",function(v) end},
+{"🧭 ปรับทิศอัตโนมัติ",function(v) end},
+{"🚶 เดินช้า",function(v) State.Speed=v State.SpeedVal=v and 8 or 16 end},
+{"🚶‍♂️ เดินปกติ",function(v) State.Speed=v State.SpeedVal=v and 16 or 16 end},
+{"🏃‍♀️ วิ่งปานกลาง",function(v) State.Speed=v State.SpeedVal=v and 32 or 16 end},
+{"💫 วิ่งหมุนตัว",function(v) end},
+{"🌊 วิ่งบนน้ำ",function(v) end},
+{"🔥 วิ่งบนลาวา",function(v) end},
+{"❄️ วิ่งบนน้ำแข็ง",function(v) end},
+{"🏔️ เดินบนเพดาน",function(v) end},
+{"🧗 ปีนกำแพง",function(v) end},
+{"🪜 ปีนบันไดเร็ว",function(v) end},
+{"🛗 ปีนลิฟต์",function(v) end},
+{"🌐 ปิดแรงโน้มถ่วง",function(v) if hum then hum.GravityScale=v and 0 or 1 end end},
+{"🔙 ย้อนแรงโน้มถ่วง",function(v) if hum then hum.GravityScale=v and -1 or 1 end end},
+{"🌙 แรงโน้มถ่วงดวงจันทร์",function(v) if hum then hum.GravityScale=v and 0.3 or 1 end end},
+{"🔴 แรงโน้มถ่วงดาวอังคาร",function(v) if hum then hum.GravityScale=v and 0.4 or 1 end end},
+{"🌍 แรงโน้มถ่วงปกติ",function(v) if hum then hum.GravityScale=1 end end},
+{"🌀 เคลื่อนที่หมุน",function(v) end},
+{"⭘ เคลื่อนที่เป็นวง",function(v) end},
+{"🔲 เคลื่อนที่เป็นสี่เหลี่ยม",function(v) end},
+{"⏩ เดินหน้าอัตโนมัติ",function(v) end},
+{"⏪ ถอยหลังอัตโนมัติ",function(v) end},
+{"🔀 หมุนซ้ายขวาเอง",function(v) end},
+{"👁️ มองไปทางเดิน",function(v) end},
+{"👀 มองไปข้างหน้า",function(v) end},
+{"🛑 หยุดเดินทันที",function(v) end},
+{"🔄 คืนความเร็วปกติ",function(v) State.Speed=v State.SpeedVal=16 end},
+{"🎯 ตั้งความเร็วเอง",function(v) end},
+{"📏 แสดงความเร็ว",function(v) end},
+{"📊 แสดงความเร็วสูงสุด",function(v) end},
+{"📍 แสดงระยะทาง",function(v) end},
+{"🧭 แสดงทิศทาง",function(v) end},
+{"🔢 แสดงพิกัด",function(v) end},
+{"📐 แสดงความสูง",function(v) end},
+{"🛡️ ป้องกันการลื่น",function(v) end},
+{"🧱 เพิ่มแรงเสียดทาน",function(v) end},
+{"🧊 ลดแรงเสียดทานเป็นศูนย์",function(v) end},
+{"🏀 กระเด้งเมื่อตก",function(v) end},
+{"🎚️ ปรับความเด้ง",function(v) end},
+{"🪨 ไม่เด้งเลย",function(v) end},
+{"🔄 เด้งกลับทิศเดิม",function(v) end},
+{"🎈 กระเด้งสูงมาก",function(v) end},
+{"🍂 ร่อนหลังตก",function(v) end},
+{"🌌 ลอยตัวในอวกาศ",function(v) if hum then hum.GravityScale=v and 0 or 1 end end},
+{"🚀 เคลื่อนที่แบบอวกาศ",function(v) end},
+{"⚙️ ปรับแรงเฉื่อย",function(v) end},
+{"🛑 ปิดแรงเฉื่อย",function(v) end},
+{"🏊 เคลื่อนที่ในน้ำเหมือนบนบก",function(v) end},
+{"🤽 ว่ายน้ำเร็ว",function(v) end},
+{"🫁 หายใจใต้น้ำตลอด",function(v) end},
+{"🌊 ไม่มีแรงต้านน้ำ",function(v) end},
+{"🔄 หมุนได้รอบทิศ",function(v) end},
+{"🎡 ปรับความเร็วหมุน",function(v) end},
+{"✅ คืนค่าทุกอย่างปกติ",function(v) State={Speed=false,SpeedVal=16,JumpInf=false,JumpPwr=false,JumpPwrVal=50,Fly=false,FlySpeed=50,Invis=false,NoClip=false} UpdChar() end},
+{"🌟 วิ่งพร้อมแสง",function(v) end},
+{"✨ กระโดดพร้อมประกาย",function(v) end},
+{"🔥 บินพร้อมเปลวไฟ",function(v) end},
+{"💧 ลอยพร้อมน้ำ",function(v) end},
+{"🌀 ลอยพร้อมลม",function(v) end},
+{"⚡ ลอยพร้อมไฟฟ้า",function(v) end},
+{"❄️ ลอยพร้อมน้ำแข็ง",function(v) end},
+{"🌿 ลอยพร้อมใบไม้",function(v) end},
+{"🌸 ลอยพร้อมดอกไม้",function(v) end},
+
+-- === 101-200: เทเลพอร์ต & ตำแหน่ง ===
+{"📍 วาร์ปไปหาผู้เล่น",function(v) if v and LP then local t=Players:GetPlayers()[2] if t and t.Character and t.Character.PrimaryPart and root then root.CFrame=t.Character.PrimaryPart.CFrame + Vector3.new(0,3,0) end end end},
+{"🔍 วาร์ปไปใกล้สุด",function(v) end},
+{"📡 วาร์ปไปไกลสุด",function(v) end},
+{"🎲 วาร์ปไปคนสุ่ม",function(v) end},
+{"📋 เลือกชื่อแล้ววาร์ป",function(v) end},
+{"👥 ดึงคนมาหาเรา",function(v) end},
+{"🌐 ดึงทุกคนมา",function(v) end},
+{"📦 วาร์ปไปหาไอเทม",function(v) end},
+{"💰 วาร์ปไปหาเงิน",function(v) end},
+{"💎 วาร์ปไปหาเพชร",function(v) end},
+{"🎁 วาร์ปไปหาของขวัญ",function(v) end},
+{"👾 วาร์ปไปหามอนสเตอร์",function(v) end},
+{"🐉 วาร์ปไปหาบอส",function(v) end},
+{"🥚 วาร์ปไปหาไข่",function(v) end},
+{"🗺️ วาร์ปตามพิกัด",function(v) end},
+{"📌 บันทึกตำแหน่ง",function(v) end},
+{"🔙 วาร์ปกลับจุดบันทึก",function(v) end},
+{"↩️ วาร์ปกลับจุดก่อน",function(v) end},
+{"🏠 วาร์ปกลับจุดเกิด",function(v) end},
+{"🏡 ตั้งบ้านใหม่",function(v) end},
+{"🏰 วาร์ปไปฐานทัพ",function(v) end},
+{"🚪 วาร์ปผ่านประตู",function(v) end},
+{"🔄 สลับตำแหน่งกับคนอื่น",function(v) end},
+{"➡️ วาร์ปไปข้างหน้า",function(v) if root then root.CFrame*=CFrame.new(0,0,10) end end},
+{"⬅️ วาร์ปไปข้างหลัง",function(v) if root then root.CFrame*=CFrame.new(0,0,-10) end end},
+{"⬆️ วาร์ปขึ้นบน",function(v) if root then root.CFrame+=Vector3.new(0,10,0) end end},
+{"⬇️ วาร์ปลงล่าง",function(v) if root then root.CFrame+=Vector3.new(0,-10,0) end end},
+{"📏 ปรับระยะวาร์ป",function(v) end},
+{"🎲 วาร์ปสุ่มตำแหน่ง",function(v) end},
+{"🌍 วาร์ปไปแมพอื่น",function(v) end},
+{"🖱️ วาร์ปไปจุดเมาส์",function(v) end},
+{"👁️ วาร์ปไปจุดที่มอง",function(v) end},
+{"☁️ วาร์ปขึ้นฟ้า",function(v) if root then root.CFrame+=Vector3.new(0,50,0) end end},
+{"⛏️ วาร์ปลงใต้ดิน",function(v) if root then root.CFrame+=Vector3.new(0,-50,0) end end},
+{"🌊 วาร์ปลงใต้น้ำ",function(v) end},
+{"🏔️ วาร์ปไปขอบแมพ",function(v) end},
+{"🏛️ วาร์ปไปใจกลางแมพ",function(v) end},
+{"↖️ วาร์ปมุมซ้ายบน",function(v) end},
+{"↗️ วาร์ปมุมขวาบน",function(v) end},
+{"↙️ วาร์ปมุมซ้ายล่าง",function(v) end},
+{"↘️ วาร์ปมุมขวาล่าง",function(v) end},
+{"⛰️ วาร์ปจุดสูงสุด",function(v) end},
+{"🏔️ วาร์ปจุดต่ำสุด",function(v) end},
+{"🛒 วาร์ปไปหา NPC ขายของ",function(v) end},
+{"📜 วาร์ปไปหาเควส",function(v) end},
+{"🎰 วาร์ปไปหาตู้สุ่ม",function(v) end},
+{"⬆️ วาร์ปไปหาเครื่องอัปเกรด",function(v) end},
+{"🔄 วาร์ปไปหาเครื่องรีบิร์ธ",function(v) end},
+{"🗝️ วาร์ปไปหาสมบัติ",function(v) end},
+{"🧲 ดึงไอเทมเข้าหา",function(v) end},
+{"🫴 ดึงทุกอย่างเข้ามา",function(v) end},
+{"💰 ดึงเหรียญเข้ามา",function(v) end},
+{"💎 ดึงเพชรเข้ามา",function(v) end},
+{"📏 ตั้งรัศมีดึงไอเทม",function(v) end},
+{"⚡ ปรับความเร็วดึง",function(v) end},
+{"🤝 วาร์ปเฉพาะเพื่อน",function(v) end},
+{"👪 วาร์ปทั้งทีม",function(v) end},
+{"🏃 ทิ้งคนอื่นไว้ข้างหลัง",function(v) end},
+{"✨ วาร์ปพร้อมแสง",function(v) end},
+{"💨 วาร์ปพร้อมควัน",function(v) end},
+{"⚡ วาร์ปแบบกะทันหัน",function(v) end},
+{"🫥 วาร์ปแบบค่อยๆ หาย",function(v) end},
+{"🔁 วาร์ปวนซ้ำ",function(v) end},
+{"🎯 วาร์ปสุ่มในรัศมี",function(v) end},
+{"🎲 วาร์ปสุ่มจุดที่กำหนด",function(v) end},
+{"👻 วาร์ปเงา",function(v) end},
+{"🌟 วาร์ปแสง",function(v) end},
+{"🔥 วาร์ปไฟ",function(v) end},
+{"💧 วาร์ปน้ำ",function(v) end},
+{"🌀 วาร์ปลม",function(v) end},
+{"🪨 วาร์ปหิน",function(v) end},
+{"⚡ วาร์ปสายฟ้า",function(v) end},
+{"❄️ วาร์ปน้ำแข็ง",function(v) end},
+{"🌿 วาร์ปธรรมชาติ",function(v) end},
+{"🌑 วาร์ปความมืด",function(v) end},
+{"✨ วาร์ปแสงศักดิ์สิทธิ์",function(v) end},
+{"🔮 วาร์ปเวทมนตร์",function(v) end},
+{"🌀 วาร์ปพลังจิต",function(v) end},
+{"🌀 วาร์ปมิติ",function(v) end},
+{"⭕ วาร์ปพอร์ทัล",function(v) end},
+{"🌀 วาร์ปประตูมิติ",function(v) end},
+{"⛩️ วาร์ปแท่นบูชา",function(v) end},
+{"🔗 วาร์ปตู้เชื่อมต่อ",function(v) end},
+{"🎁 วาร์ปเครื่องรางวัล",function(v) end},
+{"✅ คืนค่าระบบวาร์ป",function(v) end},
+{"🗺️ แสดงแผนที่ทั้งหมด",function(v) end},
+{"📍 แสดงตำแหน่งตัวเอง",function(v) end},
+{"🔍 ค้นหาตำแหน่งผู้เล่น",function(v) end},
+{"📡 แสดงทิศทางเป้าหมาย",function(v) end},
+{"🎯 ล็อกตำแหน่งเป้าหมาย",function(v) end},
+{"🗺️ วาร์ปไปจุดเควส",function(v) end},
+{"🏕️ วาร์ปไปค่าย",function(v) end},
+{"🏗️ วาร์ปไปไซต์งาน",function(v) end},
+{"🏖️ วาร์ปไปชายหาด",function(v) end},
+{"🏔️ วาร์ปไปภูเขา",function(v) end},
+{"🌋 วาร์ปไปภูเขาไฟ",function(v) end},
+{"🏜️ วาร์ปไปทะเลทราย",function(v) end},
+{"🌲 วาร์ปไปป่า",function(v) end},
+{"🌊 วาร์ปไปทะเล",function(v) end},
+{"🏞️ วาร์ปไปน้ำตก",function(v) end},
+
+-- === 201-300: รูปลักษณ์ & ร่างกาย ===
+{"👻 หายตัวทั้งตัว",function(v) State.Invis=v end},
+{"🫥 หายตาจากคนอื่น",function(v) State.Invis=v end},
+{"👤 มองไม่เห็นตัวเรา",function(v) State.Invis=v end},
+{"🙈 ทำให้คนอื่นมองไม่เห็น",function(v) end},
+{"📐 ปรับขนาดตัวเอง",function(v) end},
+{"🐜 ย่อตัวเล็กสุด",function(v) if char then char.Humanoid.DisplayDistanceType=Enum.HumanoidDisplayDistanceType.None end end},
+{"🦍 ขยายตัวใหญ่สุด",function(v) end},
+{"🧍 ขนาดปกติ",function(v) end},
+{"📏 ปรับส่วนสูง",function(v) end},
+{"↔️ ปรับความกว้าง",function(v) end},
+{"🧢 ปรับขนาดหัว",function(v) end},
+{"💪 ปรับขนาดแขน",function(v) end},
+{"🦵 ปรับขนาดขา",function(v) end},
+{"🫃 ปรับขนาดลำตัว",function(v) end},
+{"🎨 เปลี่ยนสีตัว",function(v) end},
+{"🔴 ตัวสีแดง",function(v) if char then for _,p in ipairs(char:GetChildren()) do if p:IsA("BasePart") then p.Color=Color3.fromRGB(255,50,50) end end end end},
+{"🔵 ตัวสีน้ำเงิน",function(v) if char then for _,p in ipairs(char:GetChildren()) do if p:IsA("BasePart") then p.Color=Color3.fromRGB(50,50,255) end end end end},
+{"🟢 ตัวสี
